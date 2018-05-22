@@ -10,6 +10,44 @@ namespace EnterpriseLibrary.Test.MySql
     {
         static void Main(string[] args)
         {
+            //TestOracle();
+            //TestMySql();
+            TestMySqlDataSet();
+        }
+
+        private static void TestOracle()
+        {
+            const string sqlCmd = @"INSERT INTO CITY
+                                    (
+                                        CITYID,
+	                                    NAME
+                                    )
+                                    VALUES
+                                    (
+                                        :CityID,
+	                                    :Name
+                                    )";
+
+            DatabaseFactory.SetDatabaseProviderFactory(new DatabaseProviderFactory(new SystemConfigurationSource(false).GetSection), false);
+            Database db = DatabaseFactory.CreateDatabase("BizDbOracle");
+
+            using (DbCommand cmd = db.GetSqlStringCommand(sqlCmd))
+            {
+                try
+                {
+                    db.AddInParameter(cmd, "CITYID", DbType.Int32, 2);
+                    db.AddInParameter(cmd, "NAME", DbType.String, "London");
+                    db.ExecuteNonQuery(cmd);
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+        }
+
+        private static void TestMySql()
+        {
             const string sqlCmd = @"INSERT INTO City
                                     (
                                         CityID,
@@ -33,6 +71,26 @@ namespace EnterpriseLibrary.Test.MySql
                     db.ExecuteNonQuery(cmd);
                 }
                 catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        private static void TestMySqlDataSet()
+        {
+            const string sqlCmd = @"Select * from City";
+
+            DatabaseFactory.SetDatabaseProviderFactory(new DatabaseProviderFactory(new SystemConfigurationSource(false).GetSection), false);
+            Database db = DatabaseFactory.CreateDatabase("BizDbMySql");
+
+            using (DbCommand cmd = db.GetSqlStringCommand(sqlCmd))
+            {
+                try
+                {
+                    var dataset = db.ExecuteDataSet(cmd);
+                }
+                catch (Exception ex)
                 {
                     throw;
                 }
